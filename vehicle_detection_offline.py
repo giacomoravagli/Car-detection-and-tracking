@@ -8,7 +8,7 @@ import imageio
 import matplotlib.animation as animation
 from matplotlib.animation import FFMpegWriter
 
-kk = plt.figure()
+author = plt.figure() # Necessary for the creation of the video only
 
 COCO_INSTANCE_CATEGORY_NAMES = [
 '__background__', 'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
@@ -55,7 +55,7 @@ def detection(img):
                     '%s' % (COCO_INSTANCE_CATEGORY_NAMES[cls.item()]),
                     bbox=dict(facecolor='blue', alpha=0.5),
                     fontsize=10, color='white')
-    #plt.savefig('C:/Users/giaco/Desktop/detection_output.png')
+    #return the modified frame to be used for video creation
     return fig
 
 
@@ -74,8 +74,7 @@ for i, frame in enumerate(reader): # We iterate on the frames of the output vide
 #writer.close() # We close the process that handles the creation of the output video.
 
 mywriter = animation.FFMpegWriter(fps=fps)
-ani = animation.ArtistAnimation(kk, framelist, interval=50, blit=True,
-                                repeat_delay=1000)
+ani = animation.ArtistAnimation(author, framelist, interval=(1000//fps), blit=True)
 ani.save('C:/Users/giaco/Desktop/dynamic_images.mp4', writer=mywriter)
 
 plt.show()
