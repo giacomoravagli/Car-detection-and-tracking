@@ -1,5 +1,6 @@
 import torchvision
 import torch
+import numpy as np
 from torchvision import transforms
 from torchvision.datasets.folder import default_loader
 import cv2
@@ -28,14 +29,13 @@ COCO_INSTANCE_CATEGORY_NAMES = [
 # Load and evaluate the network
 model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
 model.eval() # Set network in eval mode (e.g. disable dropout, batchnorm, ...)
-
+tfs = transforms.Compose([transforms.ToTensor()])
 
 def detection(img):
     # Draw detections on image
-    tfs = transforms.Compose([transforms.ToTensor()])
     img_th = tfs(img)
+    model.eval()  # Set network in eval mode (e.g. disable dropout, batchnorm, ...)
     output = model([img_th])[0] # Output is a List[Dict], one element for each input image
-
     # We take each frame as an image; output var. is a dictionary containing info on where the box is,
     # which is the label of the detection and the score. We simply generate a new image placing informations
     # on top of the original image
@@ -58,23 +58,16 @@ def detection(img):
     #return the modified frame to be used for video creation
     return fig
 
+writer = animation.FFMpegWriter(fps=2)
 
 # Load and normalize the image
-reader = imageio.get_reader('C:/Users/giaco/Desktop/car_video_extremetrim.mp4') # We open the video.
+reader = imageio.get_reader('C:/Users/giaco/Desktop/car_video_Trim_8sec_2fps.mp4') # We open the video.
 fps = reader.get_meta_data()['fps'] # We get the fps frequence (frames per second).
 print(fps)
 print()
-framelist = []
 #writer = imageio.get_writer('C:/Users/giaco/Desktop/output.mp4', fps = fps) # We create an output video with this same fps frequence.
-for i, frame in enumerate(reader): # We iterate on the frames of the output video:
-    frame = detection(frame) # We call our detect function (defined above) to detect the object on the frame.
-    #writer.append_data(frame) # We add the next frame in the output video.
-    framelist.append([frame])
-    print(i) # We print the number of the processed frame.
-#writer.close() # We close the process that handles the creation of the output video.
-
-mywriter = animation.FFMpegWriter(fps=fps)
-ani = animation.ArtistAnimation(author, framelist, interval=(1000//fps), blit=True)
-ani.save('C:/Users/giaco/Desktop/dynamic_images.mp4', writer=mywriter)
-
-plt.show()
+with writer.saving(author, "C:/Users/giaco/Desktop/writer_test.mp4", 100):
+    for i, frame in enumerate(reader): # We iterate on the frames of the output video:
+        aa = detection(frame) # We call our detect function (defined above) to detect the object on the frame.
+        writer.grab_frame()
+        print(i) # We print the number of the processed frame.
