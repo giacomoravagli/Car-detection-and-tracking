@@ -67,14 +67,12 @@ print()
 framelist = []
 #writer = imageio.get_writer('C:/Users/giaco/Desktop/output.mp4', fps = fps) # We create an output video with this same fps frequence.
 for i, frame in enumerate(reader): # We iterate on the frames of the output video:
-    frame = detection(frame) # We call our detect function (defined above) to detect the object on the frame.
+    aa = detection(frame) # We call our detect function (defined above) to detect the object on the frame.
     #writer.append_data(frame) # We add the next frame in the output video.
-    framelist.append([frame])
+    framelist.append(aa)
     print(i) # We print the number of the processed frame.
 #writer.close() # We close the process that handles the creation of the output video.
 
 mywriter = animation.FFMpegWriter(fps=fps)
-ani = animation.ArtistAnimation(author, framelist, interval=(1000//fps), blit=True)
+ani = animation.ArtistAnimation(framelist, framelist, interval=(1000//fps), blit=True)
 ani.save('C:/Users/giaco/Desktop/dynamic_images.mp4', writer=mywriter)
-
-plt.show()
